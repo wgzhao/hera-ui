@@ -22,7 +22,8 @@ const defaultConfig: AxiosRequestConfig = {
   headers: {
     Accept: "application/json, text/plain, */*",
     "Content-Type": "application/json",
-    "X-Requested-With": "XMLHttpRequest"
+    "X-Requested-With": "XMLHttpRequest",
+    "Access-Control-Allow-Origin": "*"
   },
   // 数组格式参数序列化（https://github.com/axios/axios/issues/5142）
   paramsSerializer: {
@@ -78,37 +79,37 @@ class PureHttp {
         return whiteList.some(url => config.url.endsWith(url))
           ? config
           : new Promise(resolve => {
-            const data = getToken();
-            if (data) {
-              const now = new Date().getTime();
-              const expired = parseInt(data.expires) - now <= 0;
-              if (expired) {
-                if (!PureHttp.isRefreshing) {
-                  PureHttp.isRefreshing = true;
-                  // token过期刷新
-                  useUserStoreHook()
-                    .handRefreshToken({ refreshToken: data.refreshToken })
-                    .then(res => {
-                      const token = res.data.accessToken;
-                      config.headers["Authorization"] = formatToken(token);
-                      PureHttp.requests.forEach(cb => cb(token));
-                      PureHttp.requests = [];
-                    })
-                    .finally(() => {
-                      PureHttp.isRefreshing = false;
-                    });
+              const data = getToken();
+              if (data) {
+                const now = new Date().getTime();
+                const expired = parseInt(data.expires) - now <= 0;
+                if (expired) {
+                  if (!PureHttp.isRefreshing) {
+                    PureHttp.isRefreshing = true;
+                    // token过期刷新
+                    useUserStoreHook()
+                      .handRefreshToken({ refreshToken: data.refreshToken })
+                      .then(res => {
+                        const token = res.data.accessToken;
+                        config.headers["Authorization"] = formatToken(token);
+                        PureHttp.requests.forEach(cb => cb(token));
+                        PureHttp.requests = [];
+                      })
+                      .finally(() => {
+                        PureHttp.isRefreshing = false;
+                      });
+                  }
+                  resolve(PureHttp.retryOriginalRequest(config));
+                } else {
+                  config.headers["Authorization"] = formatToken(
+                    data.accessToken
+                  );
+                  resolve(config);
                 }
-                resolve(PureHttp.retryOriginalRequest(config));
               } else {
-                config.headers["Authorization"] = formatToken(
-                  data.accessToken
-                );
                 resolve(config);
               }
-            } else {
-              resolve(config);
-            }
-          });
+            });
       },
       error => {
         return Promise.reject(error);

@@ -1,4 +1,14 @@
 /* $sideBarWidth: vertical 模式下主体内容距离网页文档左侧的距离 */
+$menuBg: null;
+$sideBarWidth: null;
+$menuText: null;
+$menuHover: null;
+$menuTitleHover: null;
+$menuActiveBefore: null;
+$subMenuActiveText: null;
+$subMenuBg: null;
+$sidebarLogo: null;
+
 @mixin merge-style($sideBarWidth) {
   $menuActiveText: #7a80b4;
 
