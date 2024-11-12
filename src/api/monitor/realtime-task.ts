@@ -31,11 +31,23 @@ export type Task = {
   numAMContainerPreempted: string;
   logAggregationStatus: string;
   spendTime: string;
-}
+};
 export type RtTaskResult = {
   success: boolean;
   data: Array<Task>;
-}
-export const getRealtimeTasks = (params?: object) => {
-  return http.request<RtTaskResult>("get", "/offlineTaskMonitoring/taskInfo", { params });
+};
+export function getRealtimeTasks(params?: object) {
+  params = params || {};
+  params["taskSv"] = "0";
+  params["ateVal"] = "";
+  params["userVal"] = "";
+  params["page"] = params["page"] || 1;
+  params["limit"] = params["limit"] || 10;
+  return http.request<RtTaskResult>(
+    "get",
+    "/hera/offlineTaskMonitoring/taskInfo",
+    {
+      params
+    }
+  );
 }

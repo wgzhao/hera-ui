@@ -1,6 +1,6 @@
 {
-  "name": "pure-admin-thin",
-  "version": "5.8.0",
+  "name": "hera-ui",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,16 +15,9 @@
     "clean:cache": "rimraf .eslintcache && rimraf node_modules && pnpm store prune && pnpm install"
   },
   "keywords": [
-    "pure-admin-thin",
-    "vue-pure-admin",
-    "element-plus",
-    "tailwindcss",
-    "pure-admin",
-    "typescript",
-    "pinia",
-    "vue3",
-    "vite",
-    "esm"
+    "hera",
+    "etl",
+    "bigdata"
   ],
   "homepage": "https://github.com/pure-admin/pure-admin-thin",
   "repository": {
