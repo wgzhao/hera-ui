@@ -36,12 +36,7 @@ export type RefreshTokenResult = {
 
 /** 登录 */
 export const getLogin = (data?: object) => {
-  return http.request<UserResult>("post", "/loginCheck", {
-    data,
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-    }
-  });
+  return http.request<UserResult>("post", "/auth/login", { data });
 };
 
 /** 刷新`token` */

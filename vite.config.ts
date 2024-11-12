@@ -31,7 +31,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       // 本地跨域代理 https://cn.vitejs.dev/config/server-options.html#server-proxy
       proxy: {
         [VITE_SERVER_API_URL]: {
-          target: "http://188.166.1.96:8090/hera",
+          target: "http://127.0.0.1:8090/hera",
           changeOrigin: true,
           rewrite: path =>
             path.replace(new RegExp(`^${VITE_SERVER_API_URL}`), "")
