@@ -33,19 +33,21 @@ export type Task = {
   spendTime: string;
 };
 export type RtTaskResult = {
-  success: boolean;
+  msg: string;
+  count: number;
+  code: number;
   data: Array<Task>;
 };
 export function getRealtimeTasks(params?: object) {
   params = params || {};
   params["taskSv"] = "0";
-  params["ateVal"] = "";
+  params["dateVal"] = "";
   params["userVal"] = "";
   params["page"] = params["page"] || 1;
   params["limit"] = params["limit"] || 10;
   return http.request<RtTaskResult>(
     "get",
-    "/hera/offlineTaskMonitoring/taskInfo",
+    "/offlineTaskMonitoring/taskInfo",
     {
       params
     }
