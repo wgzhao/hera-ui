@@ -43,7 +43,7 @@
     "axios": "^1.7.4",
     "dayjs": "^1.11.12",
     "echarts": "^5.5.1",
-    "element-plus": "^2.8.0",
+    "element-plus": "^2.8.7",
     "js-cookie": "^3.0.5",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
