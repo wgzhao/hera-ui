@@ -1,5 +1,5 @@
 <template>
-  <div ref="chartRef" style="width: 100%; height: 365px" />
+  <div ref="chartRef" style="width: 100%;" />
 </template>
 <script setup lang="ts">
 import { useDark, useECharts } from "@pureadmin/utils";
@@ -34,7 +34,7 @@ watch(
   async () => {
     await nextTick(); // 确保DOM更新完成后再执行
     setOptions({
-      container: ".line-card",
+      // container: ".line-card",
       color: ["#41b6ff", "#e85f33"],
       tooltip: {
         trigger: "axis",
@@ -48,7 +48,7 @@ watch(
         right: 0
       },
       legend: {
-        data: ["需求人数", "提问数量"],
+        data: ["成功任务数", "失败任务数"],
         textStyle: {
           color: "#606266",
           fontSize: "0.875rem"
@@ -57,7 +57,8 @@ watch(
       },
       xAxis: [
         {
-          type: "time",
+          type: "category",
+          name: "日期",
           data: props.dayRange,
           axisLabel: {
             fontSize: "0.875rem"
@@ -83,7 +84,6 @@ watch(
         {
           name: "成功任务数",
           type: "line",
-          barWidth: 10,
           itemStyle: {
             color: "#41b6ff",
             borderRadius: [10, 10, 0, 0]
@@ -93,7 +93,6 @@ watch(
         {
           name: "失败任务数",
           type: "line",
-          barWidth: 10,
           itemStyle: {
             color: "#e86033ce",
             borderRadius: [10, 10, 0, 0]

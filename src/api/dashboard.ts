@@ -20,6 +20,12 @@ export type JobSummary = {
   link: string;
 };
 
+export type AllJobStatusDetailResult = BaseResult<{
+  xAxis: Array<string>;
+  runSuccess: Array<Map<string, any>>;
+  runFailed: Array<Map<string, any>>;
+}>
+
 export const getJobRunTimeTop10 = () => {
   return http.request<TopJobResult>("get", "/homePage/findJobRunTimeTop10");
 };
@@ -29,7 +35,7 @@ export const getAllJobStatus = () => {
 };
 
 export const getAllJobStatusDetail = () => {
-  return http.request<any>("get", "/homePage/findAllJobStatusDetail");
+  return http.request<AllJobStatusDetailResult>("get", "/homePage/findAllJobStatusDetail");
 };
 
 export const getUserJobInfo = (owner: string) => {

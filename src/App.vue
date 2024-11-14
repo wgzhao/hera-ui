@@ -1,7 +1,7 @@
 <template>
   <el-config-provider :locale="currentLocale">
     <router-view />
-    <ReDialog />
+    <!-- <ReDialog /> -->
   </el-config-provider>
 </template>
 
@@ -14,8 +14,8 @@ import zhCn from "element-plus/es/locale/lang/zh-cn";
 export default defineComponent({
   name: "app",
   components: {
-    [ElConfigProvider.name]: ElConfigProvider,
-    ReDialog
+    [ElConfigProvider.name]: ElConfigProvider
+    // ReDialog
   },
   computed: {
     currentLocale() {

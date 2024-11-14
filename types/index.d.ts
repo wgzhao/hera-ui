@@ -80,3 +80,9 @@ function parseInt(s: string | number, radix?: number): number;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function parseFloat(string: string | number): number;
+
+interface BaseResult<T = any> {
+  success: boolean;
+  message: string;
+  data: T;
+}

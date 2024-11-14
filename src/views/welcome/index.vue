@@ -5,19 +5,20 @@ import {
   getAllJobStatusDetail,
   getUserJobInfo
 } from "@/api/dashboard";
-import type { TopJob, TopJobResult, JobSummary } from "@/api/dashboard";
+import type { TopJob, TopJobResult, JobSummary, AllJobStatusDetailResult } from "@/api/dashboard";
 import ReCol from "@/components/ReCol";
 import { Last7DayChartLine, Top10RunJob } from "./components/charts";
 import Segmented, { type OptionsType } from "@/components/ReSegmented";
-
+import { useDark } from "@pureadmin/utils";
 defineOptions({
   name: "Welcome"
 });
 
 const result = ref([]);
-const last7DaysJobInfo = ref([]);
+const last7DaysJobInfo = ref({});
 const top10RunJobs = ref([]);
 
+const { isDark } = useDark();
 const currDay = ref(1); // 0 昨日; 1 今日
 const optionsBasis: Array<OptionsType> = [
   { label: "今日", value: 1 },
@@ -49,42 +50,54 @@ onMounted(() => {
       }
     ];
   });
-
   getAllJobStatusDetail().then(res => last7DaysJobInfo.value = res.data);
   getJobRunTimeTop10().then(res => top10RunJobs.value = res.data);
+  console.log("last7DaysJobInfo: => ", last7DaysJobInfo.value);
 });
 </script>
 
 <template>
   <div>
-    <div class="card-header bottom-3">数据监测</div>
-    <el-row :gutter="24">
-      <template v-for="info in result">
-        <re-col :value="6" :xs="24" :sm="24">
-          <div class="statistic-card">
-            <el-statistic :value="info.count" :title="info.name" />
-            <el-link class="mt-2" :to="info.link" target="_blank">
-              查看详情
-            </el-link>
+    <div class="bottom-10">数据监测</div>
+    <el-row :gutter="24" justify="space-around">
+      <re-col v-for="(item, index) in result" :key="index" v-motion class="mb-[18px]" :value="6" :md="12" :sm="12"
+        :xs="24">
+        <el-card class="line-card" shadow="never">
+          <div class="flex justify-between">
+            <span class="text-md font-medium">
+              {{ item.name }}
+            </span>
+            <div class="w-8 h-8 flex justify-center items-center rounded-md" :style="{
+              backgroundColor: isDark ? 'transparent' : '#effaff'
+            }">
+            </div>
           </div>
-        </re-col>
-      </template>
-    </el-row>
-  </div>
-  <el-card style="max-width: 600px" class="line-card" shadow="never">
-    <template #header>
-      <div class="card-header">
-        <span>任务执行情况</span>
-      </div>
-    </template>
-    <div class="flex justify-between items-start mt-3">
-      <Last7DayChartLine :dayRange="last7DaysJobInfo.xAxis"
-        :successJobCount="last7DaysJobInfo.runSuccess.map(item => item.num)"
-        :failedJobCount="last7DaysJobInfo.runFailed.map(item => item.num)" />
-    </div>
-  </el-card>
 
-  <!-- <el-card style="max-width: 600px" class="bar-card" shadow="never">
+          <div class="flex justify-between items-start mt-3">
+            <div class="w-1/2">
+              <p class="font-medium text-green-500">{{ item.count }}</p>
+            </div>
+          </div>
+        </el-card>
+
+      </re-col>
+
+
+      <re-col class="mb-[18px]" :value="18" :xs="24">
+        <el-card shadow="never">
+          <div class="flex justify-between">
+            <span class="text-md font-medium">任务执行情况</span>
+          </div>
+          <div class="flex justify-between items-start mt-3">
+            <Last7DayChartLine :dayRange="last7DaysJobInfo.xAxis"
+              :successJobCount="last7DaysJobInfo.runSuccess.map(item => item.num)"
+              :failedJobCount="last7DaysJobInfo.runFailed.map(item => item.num)" />
+          </div>
+        </el-card>
+      </re-col>
+    </el-row>
+
+    <!-- <el-card style="max-width: 600px" class="bar-card" shadow="never">
     <template #header>
       <div class="card-header">
         <span>任务耗时 Top 10</span>
@@ -97,38 +110,34 @@ onMounted(() => {
         :lastDayJobTimes="top10RunJobs.map(item => item.yesterdayTime)" />
     </div>
   </el-card> -->
+  </div>
 </template>
-<style scoped>
-.el-statistic {
-  --el-statistic-content-font-size: 28px;
+<style lang="scss" scoped>
+:deep(.el-card) {
+  --el-card-border-color: none;
+
+  /* 解决概率进度条宽度 */
+  .el-progress--line {
+    width: 85%;
+  }
+
+  /* 解决概率进度条字体大小 */
+  .el-progress-bar__innerText {
+    font-size: 15px;
+  }
+
+  /* 隐藏 el-scrollbar 滚动条 */
+  .el-scrollbar__bar {
+    display: none;
+  }
+
+  /* el-timeline 每一项上下、左右边距 */
+  .el-timeline-item {
+    margin: 0 6px;
+  }
 }
 
-.statistic-card {
-  height: 100%;
-  padding: 20px;
-  border-radius: 4px;
-  background-color: var(--el-bg-color-overlay);
-}
-
-.statistic-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  font-size: 12px;
-  color: var(--el-text-color-regular);
-  margin-top: 16px;
-}
-
-.statistic-footer .footer-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.statistic-footer .footer-item span:last-child {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 4px;
+.main-content {
+  margin: 20px 20px 0 !important;
 }
 </style>
