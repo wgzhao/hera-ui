@@ -17,7 +17,7 @@ const props = defineProps({
   jobNames: {
     type: Array as PropType<Array<string>>,
     default: () => []
-  },
+  }
 });
 
 const { isDark } = useDark();
@@ -53,14 +53,17 @@ watch(
           color: "#606266",
           fontSize: "0.875rem"
         },
-        bottom: 0
+        top: 0,
+        right: 10,
+        orient: "vertical"
       },
       xAxis: [
         {
           type: "category",
           data: props.jobNames,
           axisLabel: {
-            fontSize: "0.875rem"
+            fontSize: "9px",
+            rotate: 45
           },
           axisPointer: {
             type: "shadow"

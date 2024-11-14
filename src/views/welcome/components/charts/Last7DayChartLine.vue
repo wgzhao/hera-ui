@@ -1,5 +1,6 @@
 <template>
-  <div ref="chartRef" style="width: 100%;" />
+  <div></div>
+  <div ref="chartRef" style="width: 100%; height: 365px" />
 </template>
 <script setup lang="ts">
 import { useDark, useECharts } from "@pureadmin/utils";
@@ -34,7 +35,7 @@ watch(
   async () => {
     await nextTick(); // 确保DOM更新完成后再执行
     setOptions({
-      // container: ".line-card",
+      container: ".line-card",
       color: ["#41b6ff", "#e85f33"],
       tooltip: {
         trigger: "axis",
@@ -43,25 +44,25 @@ watch(
         }
       },
       grid: {
-        top: "20px",
+        top: "40px",
         left: "50px",
-        right: 0
+        right: "50px"
       },
       legend: {
         data: ["成功任务数", "失败任务数"],
         textStyle: {
           color: "#606266",
-          fontSize: "0.875rem"
+          fontSize: "10px"
         },
-        bottom: 0
+        top: 0
       },
       xAxis: [
         {
           type: "category",
-          name: "日期",
           data: props.dayRange,
           axisLabel: {
-            fontSize: "0.875rem"
+            fontSize: "9px",
+            rotate: 25
           },
           axisPointer: {
             type: "shadow"
@@ -71,6 +72,24 @@ watch(
       yAxis: [
         {
           type: "value",
+          name: "成功数",
+          min: 1000,
+          max: 10000,
+          position: "left",
+          axisLabel: {
+            fontSize: "0.875rem"
+          },
+          splitLine: {
+            show: false // 去网格线
+          }
+          // name: "单位: 个"
+        },
+        {
+          type: "value",
+          name: "失败数",
+          min: 0,
+          max: 100,
+          position: "right",
           axisLabel: {
             fontSize: "0.875rem"
           },
@@ -84,6 +103,7 @@ watch(
         {
           name: "成功任务数",
           type: "line",
+          yAxisIndex: 0,
           itemStyle: {
             color: "#41b6ff",
             borderRadius: [10, 10, 0, 0]
@@ -93,6 +113,7 @@ watch(
         {
           name: "失败任务数",
           type: "line",
+          yAxisIndex: 1,
           itemStyle: {
             color: "#e86033ce",
             borderRadius: [10, 10, 0, 0]

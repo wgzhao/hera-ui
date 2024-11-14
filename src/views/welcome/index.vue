@@ -5,7 +5,12 @@ import {
   getAllJobStatusDetail,
   getUserJobInfo
 } from "@/api/dashboard";
-import type { TopJob, TopJobResult, JobSummary, AllJobStatusDetailResult } from "@/api/dashboard";
+import type {
+  TopJob,
+  TopJobResult,
+  JobSummary,
+  AllJobStatusDetailResult
+} from "@/api/dashboard";
 import ReCol from "@/components/ReCol";
 import { Last7DayChartLine, Top10RunJob } from "./components/charts";
 import Segmented, { type OptionsType } from "@/components/ReSegmented";
@@ -15,17 +20,16 @@ defineOptions({
 });
 
 const result = ref([]);
-const last7DaysJobInfo = ref({});
 const top10RunJobs = ref([]);
 
-const { isDark } = useDark();
-const currDay = ref(1); // 0 昨日; 1 今日
-const optionsBasis: Array<OptionsType> = [
-  { label: "今日", value: 1 },
-  { label: "昨日", value: 0 }
-];
+const successJobs = ref<number[]>([]);
+const failedJobs = ref<number[]>();
+const dayRange = ref<string[]>([]);
 
-onMounted(() => {
+const isLoading = ref(true);
+const { isDark } = useDark();
+
+function fetchData() {
   getUserJobInfo("hz_admin").then(res => {
     result.value = [
       {
@@ -50,9 +54,17 @@ onMounted(() => {
       }
     ];
   });
-  getAllJobStatusDetail().then(res => last7DaysJobInfo.value = res.data);
-  getJobRunTimeTop10().then(res => top10RunJobs.value = res.data);
-  console.log("last7DaysJobInfo: => ", last7DaysJobInfo.value);
+  getAllJobStatusDetail().then(res => {
+    successJobs.value = res.data.runSuccess.map(item => item.num);
+    failedJobs.value = res.data.runFailed.map(item => item.num);
+    dayRange.value = res.data.xAxis;
+  });
+  getJobRunTimeTop10().then(res => (top10RunJobs.value = res.data));
+  isLoading.value = false;
+}
+
+onMounted(() => {
+  fetchData();
 });
 </script>
 
@@ -60,17 +72,21 @@ onMounted(() => {
   <div>
     <div class="bottom-10">数据监测</div>
     <el-row :gutter="24" justify="space-around">
-      <re-col v-for="(item, index) in result" :key="index" v-motion class="mb-[18px]" :value="6" :md="12" :sm="12"
-        :xs="24">
+      <re-col
+        v-for="(item, index) in result"
+        :key="index"
+        v-motion
+        class="mb-[18px]"
+        :value="6"
+        :md="12"
+        :sm="12"
+        :xs="24"
+      >
         <el-card class="line-card" shadow="never">
           <div class="flex justify-between">
             <span class="text-md font-medium">
               {{ item.name }}
             </span>
-            <div class="w-8 h-8 flex justify-center items-center rounded-md" :style="{
-              backgroundColor: isDark ? 'transparent' : '#effaff'
-            }">
-            </div>
           </div>
 
           <div class="flex justify-between items-start mt-3">
@@ -79,37 +95,43 @@ onMounted(() => {
             </div>
           </div>
         </el-card>
-
       </re-col>
 
-
-      <re-col class="mb-[18px]" :value="18" :xs="24">
-        <el-card shadow="never">
+      <re-col class="mb-[18px]" :value="12" :xs="12">
+        <el-card class="line-card" shadow="never">
           <div class="flex justify-between">
             <span class="text-md font-medium">任务执行情况</span>
           </div>
+          <div v-if="isLoading">Loading...</div>
+          <div v-else class="flex justify-between items-start mt-3">
+            <Last7DayChartLine
+              :dayRange="dayRange"
+              :successJobCount="successJobs"
+              :failedJobCount="failedJobs"
+            />
+          </div>
+        </el-card>
+      </re-col>
+
+      <re-col class="mb-[18px]" :value="12" :xs="24">
+        <el-card class="bar-card" shadow="never">
+          <template #header>
+            <div class="card-header">
+              <span>任务耗时 Top 10</span>
+            </div>
+          </template>
           <div class="flex justify-between items-start mt-3">
-            <Last7DayChartLine :dayRange="last7DaysJobInfo.xAxis"
-              :successJobCount="last7DaysJobInfo.runSuccess.map(item => item.num)"
-              :failedJobCount="last7DaysJobInfo.runFailed.map(item => item.num)" />
+            <Top10RunJob
+              :jobNames="
+                top10RunJobs.map(item => item.jobId + '(' + item.jobName + ')')
+              "
+              :currDayJobTimes="top10RunJobs.map(item => item.jobTime)"
+              :lastDayJobTimes="top10RunJobs.map(item => item.yesterdayTime)"
+            />
           </div>
         </el-card>
       </re-col>
     </el-row>
-
-    <!-- <el-card style="max-width: 600px" class="bar-card" shadow="never">
-    <template #header>
-      <div class="card-header">
-        <span>任务耗时 Top 10</span>
-        <Segmented v-model="currDay" :options="optionsBasis" />
-      </div>
-    </template>
-    <div class="flex justify-between items-start mt-3">
-      <Top10RunJob :joNames="top10RunJobs.map(item => item.jobId + '(' + item.jobName + ')')"
-        :currDayJobTimes="top10RunJobs.map(item => item.jobTime)"
-        :lastDayJobTimes="top10RunJobs.map(item => item.yesterdayTime)" />
-    </div>
-  </el-card> -->
   </div>
 </template>
 <style lang="scss" scoped>
