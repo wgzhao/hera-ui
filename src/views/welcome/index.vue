@@ -2,17 +2,27 @@
 import { ref, onMounted } from "vue";
 import {
   getJobRunTimeTop10,
-  getAllJobStatus,
   getAllJobStatusDetail,
   getUserJobInfo
 } from "@/api/dashboard";
 import type { TopJob, TopJobResult, JobSummary } from "@/api/dashboard";
 import ReCol from "@/components/ReCol";
+import { Last7DayChartLine, Top10RunJob } from "./components/charts";
+import Segmented, { type OptionsType } from "@/components/ReSegmented";
+
 defineOptions({
   name: "Welcome"
 });
 
 const result = ref([]);
+const last7DaysJobInfo = ref([]);
+const top10RunJobs = ref([]);
+
+const currDay = ref(1); // 0 昨日; 1 今日
+const optionsBasis: Array<OptionsType> = [
+  { label: "今日", value: 1 },
+  { label: "昨日", value: 0 }
+];
 
 onMounted(() => {
   getUserJobInfo("hz_admin").then(res => {
@@ -39,6 +49,9 @@ onMounted(() => {
       }
     ];
   });
+
+  getAllJobStatusDetail().then(res => last7DaysJobInfo.value = res.data);
+  getJobRunTimeTop10().then(res => top10RunJobs.value = res.data);
 });
 </script>
 
@@ -58,12 +71,34 @@ onMounted(() => {
       </template>
     </el-row>
   </div>
+  <el-card style="max-width: 600px" class="line-card" shadow="never">
+    <template #header>
+      <div class="card-header">
+        <span>任务执行情况</span>
+      </div>
+    </template>
+    <div class="flex justify-between items-start mt-3">
+      <Last7DayChartLine :dayRange="last7DaysJobInfo.xAxis"
+        :successJobCount="last7DaysJobInfo.runSuccess.map(item => item.num)"
+        :failedJobCount="last7DaysJobInfo.runFailed.map(item => item.num)" />
+    </div>
+  </el-card>
+
+  <!-- <el-card style="max-width: 600px" class="bar-card" shadow="never">
+    <template #header>
+      <div class="card-header">
+        <span>任务耗时 Top 10</span>
+        <Segmented v-model="currDay" :options="optionsBasis" />
+      </div>
+    </template>
+    <div class="flex justify-between items-start mt-3">
+      <Top10RunJob :joNames="top10RunJobs.map(item => item.jobId + '(' + item.jobName + ')')"
+        :currDayJobTimes="top10RunJobs.map(item => item.jobTime)"
+        :lastDayJobTimes="top10RunJobs.map(item => item.yesterdayTime)" />
+    </div>
+  </el-card> -->
 </template>
 <style scoped>
-:global(h2#card-usage ~ .example .example-showcase) {
-  background-color: var(--el-fill-color) !important;
-}
-
 .el-statistic {
   --el-statistic-content-font-size: 28px;
 }
