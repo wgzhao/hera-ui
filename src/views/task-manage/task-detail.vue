@@ -9,6 +9,7 @@
         :key="item.value"
         :label="item.label"
         :value="item.value"
+        @change="fetchData"
       />
     </el-select>
   </el-col>
@@ -20,6 +21,7 @@
         format="YYYY-MM-DD"
         value-format="YYYY-MM-DD"
         editable="true"
+        @calendar-change="fetchData"
       />
   </el-col>
 </el-row>
@@ -152,10 +154,18 @@ function getTodayString() {
   return `${year}-${month}-${day}`;
 }
 
+function fetchData() {
+  //status=all&dt=2024-11-15&operator=&_=1731654456641
+  const params = {};
+  params.status = taskStatus.value || "all";
+  params.dt = selectDate.value || getTodayString();
+  getAllTasks(params).then((res) => {
+    tasks.value = res.data;
+    total.value = res.data.length;
+  });
+}
+
 onMounted(() => {
-    getAllTasks().then((res) => {
-        tasks.value = res.data;
-        total.value = res.data.length;
-    });
+    fetchData();
 });
 </script>
