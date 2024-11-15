@@ -26,8 +26,18 @@ export default {
       name: "HostGroup",
       component: () => import("@/views/system-manage/host-group.vue"),
       meta: {
-        icon: "ep:group",
+        icon: "ep:grid",
         title: "机器组管理",
+        showParent: true
+      }
+    },
+    {
+      path: "/system-manage/worker",
+      name: "Worker",
+      component: () => import("@/views/system-manage/worker/index.vue"),
+      meta: {
+        icon: "ep:cpu",
+        title: "worker管理",
         showParent: true
       }
     }

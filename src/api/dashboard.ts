@@ -1,4 +1,5 @@
 import { http } from "@/utils/http";
+import { useUserStoreHook } from "@/store/modules/user";
 
 export type TopJob = {
   jobId: string;
@@ -38,8 +39,7 @@ export const getAllJobStatusDetail = () => {
   return http.get("/homePage/findAllJobStatusDetail");
 };
 
-export const getUserJobInfo = (owner: string) => {
-  return http.request<any>("get", "/homePage/getUserJobInfo", {
-    owner: owner
-  });
+export const getUserJobInfo = () => {
+  const owner = useUserStoreHook().username;
+  return http.get(`/homePage/getUserJobInfo?owner=${owner}`);
 };

@@ -30,7 +30,7 @@ const isLoading = ref(true);
 const { isDark } = useDark();
 
 function fetchData() {
-  getUserJobInfo("hz_admin").then(res => {
+  getUserJobInfo().then(res => {
     result.value = [
       {
         name: "离线任务开启数",
