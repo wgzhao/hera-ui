@@ -42,5 +42,5 @@ type taskResults = {
 export const getAllTasks = (params?: map<any>) => {
   // status=all&dt=2024-11-15&operator=&_=1731654456641
   // current date
-  return http.request<taskResults>("get", "findJobHistoryByStatus", {params})
+  return http.request<taskResults>("get", "/jobManage/findJobHistoryByStatus", {params})
 }

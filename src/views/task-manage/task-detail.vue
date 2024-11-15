@@ -25,10 +25,10 @@
       />
   </el-col>
 </el-row>
-<!-- <pure-table :data="tasks" :columns="columns" /> -->
+<pure-table :data="tasks" :columns="columns" /> 
 </div>
 </template>
-<script>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import {Refresh} from "@element-plus/icons-vue";
 import { getAllTasks } from "@/api/task-manage";
@@ -37,18 +37,8 @@ const tasks = ref([]);
 
 const columns =  ref([
     {
-        prop: '',
-        label: '序号',
-        formatter: function (val, row, index) {
-            return index + 1;
-        },
-        width: "1%"
-    }, {
         prop: 'jobId',
         label: '任务ID',
-        formatter: function (val) {
-            return '<a href = "#">' + val + '</a>';
-        },
         width: "1%",
         sortable: true
     }, {
@@ -146,12 +136,14 @@ const tableData = computed(() => {
 });
 
 function getTodayString() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1
-  const day = String(today.getDate()).padStart(2, '0');
+  return new Date().toLocaleDateString('en-CA')
+}
 
-  return `${year}-${month}-${day}`;
+function getLocalTime(timestamp) {
+    if (timestamp == null) {
+        return "";
+    }
+    return new Date(timestamp).toLocaleString('zh-CN').replaceAll('/','-')
 }
 
 function fetchData() {
@@ -159,8 +151,9 @@ function fetchData() {
   const params = {};
   params.status = taskStatus.value || "all";
   params.dt = selectDate.value || getTodayString();
+  params.operator = "";
   getAllTasks(params).then((res) => {
-    tasks.value = res.data;
+    tasks.value = res.data.slice(0,10);
     total.value = res.data.length;
   });
 }
