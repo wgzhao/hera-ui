@@ -1,149 +1,152 @@
 <template>
-<div>
-<el-row :gutter="2">
-  <el-col :span="4"><el-button :icon="Refresh" type="primary" circle /></el-col>
-  <el-col :span="6"><el-input v-model="search" placeholder="Search..." /></el-col>
-  <el-col :span="5">
-    <el-select v-model="taskStatus" placeholder="任务状态">
-      <el-option v-for="item in allStatus"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
-        @change="fetchData"
-      />
-    </el-select>
-  </el-col>
-  <el-col :span="4">
-  <el-date-picker
-        v-model="selectDate"
-        type="date"
-        placeholder="选择日期"
-        format="YYYY-MM-DD"
-        value-format="YYYY-MM-DD"
-        editable="true"
-        @calendar-change="fetchData"
-      />
-  </el-col>
-</el-row>
-<pure-table :data="tasks" :columns="columns" /> 
-</div>
+  <div>
+    <el-row class="mb-2">
+      <el-col :span="2"
+        ><el-button :icon="Refresh" type="primary" @click="fetchData"
+      /></el-col>
+      <el-col :span="2"
+        ><el-input
+          v-model="search"
+          placeholder="Search..."
+          style="width: 200px"
+          @change="fetchData"
+      /></el-col>
+      <el-col :span="2" :offset="8"
+        ><el-text class="mx-1 justify-center text-center"
+          >任务状态</el-text
+        ></el-col
+      >
+      <el-col :span="5">
+        <el-select
+          v-model="taskStatus"
+          placeholder="任务状态"
+          @change="fetchData"
+        >
+          <el-option
+            v-for="item in allStatus"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </el-col>
+      <el-col :span="5">
+        <el-date-picker
+          v-model="selectDate"
+          type="date"
+          placeholder="选择日期"
+          format="YYYY-MM-DD"
+          value-format="YYYY-MM-DD"
+          :editable="true"
+          @change="fetchData"
+        />
+      </el-col>
+    </el-row>
+    <pure-table :data="tasks" :columns="columns" />
+  </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import {Refresh} from "@element-plus/icons-vue";
+import { ref, onMounted, computed, watch } from "vue";
+import { Refresh } from "@element-plus/icons-vue";
 import { getAllTasks } from "@/api/task-manage";
 
 const tasks = ref([]);
 
-const columns =  ref([
-    {
-        prop: 'jobId',
-        label: '任务ID',
-        width: "1%",
-        sortable: true
-    }, {
-        prop: 'jobName',
-        label: '任务名称',
-        sortable: true
-    }, {
-        prop: 'description',
-        label: '任务描述',
-        sortable: true
-    }, {
-        prop: 'startTime',
-        label: '开始时间',
-        formatter: function (val) {
-            return getLocalTime(val);
-        },
-        width: "10%",
-        sortable: true
-    }, {
-        prop: 'endTime',
-        label: '结束时间',
-        formatter: function (val) {
-            return getLocalTime(val);
-        },
-        width: "10%",
-        sortable: true
-    },
-    {
-        prop: 'runTime',
-        label: '运行时间',
-        sortable: true,
-        formatter: function (val) {
-            var longFloat = parseFloat(val);
-            if (longFloat >= 3600) {
-                var h = Math.floor(longFloat / 3600);
-                var m = Math.floor(longFloat % 3600 / 60);
-                var s = (longFloat % 60) == 0 ? "" : (longFloat % 60) + "秒";
-                if (m == 0 && s == 0) {
-                    return h + '时';
-                } else {
-                    return h + '时' + m + '分' + s;
-                }
-            } else if (3600 > longFloat && longFloat > 60) {
-                var mm = Math.floor(longFloat % 3600 / 60);
-                var ss = (longFloat % 60) == 0 ? "" : (longFloat % 60) + "秒";
-                return mm + '分' + ss;
-            } else if (longFloat <= 60) {
-                return longFloat + '秒';
-            } else {
-                return val;
-            }
-        },
-        width: "6%",
-        sortable: true,
-    },
-    {
-        prop: 'times',
-        label: '执行次数',
-        sortable: true,
-        width: "5%"
-    }, {
-        prop: 'executeHost',
-        label: '执行服务器',
-        sortable: true,
-    }, {
-        prop: 'status',
-        label: '执行状态',
-        sortable: true
-    }, {
-        prop: 'operator',
-        label: '执行人',
-        sortable: true
+const columns = [
+  {
+    prop: "jobId",
+    label: "任务ID",
+    sortable: true
+  },
+  {
+    prop: "jobName",
+    label: "任务名称",
+    sortable: true
+  },
+  {
+    prop: "description",
+    label: "任务描述",
+    sortable: true
+  },
+  {
+    prop: "startTime",
+    label: "开始时间",
+    sortable: true,
+    formatter: (row: any) => {
+      return new Date(row.endTime).toLocaleTimeString();
     }
-]);
+  },
+  {
+    prop: "endTime",
+    label: "结束时间",
+    sortable: true,
+    formatter: (row: any) => {
+      return new Date(row.endTime).toLocaleTimeString();
+    }
+  },
+  {
+    prop: "runTime",
+    label: "运行时间",
+    sortable: true
+  },
+  {
+    prop: "times",
+    label: "执行次数",
+    sortable: true
+  },
+  {
+    prop: "executeHost",
+    label: "执行服务器",
+    sortable: true
+  },
+  {
+    prop: "status",
+    label: "执行状态",
+    sortable: true
+  },
+  {
+    prop: "operator",
+    label: "执行人",
+    sortable: true
+  }
+];
 
 const search = ref();
 const taskStatus = ref("all");
 // set today
-const selectDate = ref('')
+const selectDate = ref(getTodayString());
 
 const allStatus = [
-  { value: "all", label: "全部"}
-  ,{ value: "failed", label: "失败"}
-  ,{ value: "success", label: "成功"}
-  ,{ value: "running", label: "运行中"}
-  ,{ value: "wait", label: "等待"}
+  { value: "all", label: "全部" },
+  { value: "failed", label: "失败" },
+  { value: "success", label: "成功" },
+  { value: "running", label: "运行中" },
+  { value: "wait", label: "等待" }
 ];
 
-const currentPage=ref(1)
-const pageSize=ref(10)
-const total=ref(0)
+const currentPage = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
 
 const tableData = computed(() => {
-  return tasks.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value);
+  if (search.value != "") {
+    return tasks.value.filter(task => task.jobName.includes(search.value));
+  }
+  return tasks.value.slice(
+    (currentPage.value - 1) * pageSize.value,
+    currentPage.value * pageSize.value
+  );
 });
 
 function getTodayString() {
-  return new Date().toLocaleDateString('en-CA')
+  return new Date().toLocaleDateString("en-CA");
 }
 
 function getLocalTime(timestamp) {
-    if (timestamp == null) {
-        return "";
-    }
-    return new Date(timestamp).toLocaleString('zh-CN').replaceAll('/','-')
+  if (timestamp == null) {
+    return "";
+  }
+  return new Date(timestamp).toLocaleString("zh-CN").replaceAll("/", "-");
 }
 
 function fetchData() {
@@ -152,13 +155,13 @@ function fetchData() {
   params.status = taskStatus.value || "all";
   params.dt = selectDate.value || getTodayString();
   params.operator = "";
-  getAllTasks(params).then((res) => {
-    tasks.value = res.data.slice(0,10);
+  getAllTasks(params).then(res => {
+    tasks.value = res.data.slice(0, 10);
     total.value = res.data.length;
   });
 }
 
 onMounted(() => {
-    fetchData();
+  fetchData();
 });
 </script>
