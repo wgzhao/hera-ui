@@ -16,7 +16,7 @@ import { vitePluginFakeServer } from "vite-plugin-fake-server";
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-// import { PlusProComponentsResolver } from '@plus-pro-components/resolver'
+import { PlusProComponentsResolver } from '@plus-pro-components/resolver'
 
 export function getPluginsList(
   VITE_CDN: boolean,
@@ -29,7 +29,7 @@ export function getPluginsList(
       resolvers: [ElementPlusResolver()]
     }),
     Components({
-      resolvers: [ElementPlusResolver()]
+      resolvers: [ElementPlusResolver(), PlusProComponentsResolver()]
     }),
     // jsx、tsx语法支持
     vueJsx(),

@@ -103,20 +103,28 @@ watch(
         {
           name: "成功任务数",
           type: "line",
+          smooth: true,
           yAxisIndex: 0,
           itemStyle: {
             color: "#41b6ff",
             borderRadius: [10, 10, 0, 0]
+          },
+          label: {
+            show: true,
           },
           data: props.successJobCount
         },
         {
           name: "失败任务数",
           type: "line",
+          smooth: true,
           yAxisIndex: 1,
           itemStyle: {
             color: "#e86033ce",
             borderRadius: [10, 10, 0, 0]
+          },
+          label: {
+            show: true
           },
           data: props.failedJobCount
         }
