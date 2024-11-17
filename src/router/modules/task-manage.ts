@@ -12,13 +12,25 @@ export default {
   },
   children: [
     {
-      path: "/task-manage/task-detail",
+      path: "/task-manage/task-list",
+      name: "TaskList",
+      component: () => import("@/views/task-manage/task-list.vue"),
+      meta: {
+        icon: "ep:memo",
+        title: "任务列表",
+        showParent: true
+      }
+    },
+    {
+      path: "/task-manage/task-detail/:id",
       name: "TaskDetail",
       component: () => import("@/views/task-manage/task-detail.vue"),
       meta: {
         icon: "ep:memo",
         title: "任务详情",
-        showParent: true
+        showParent: false,
+        showLink: false,
+        activePath: "/task-manage/task-list"
       }
     },
     {

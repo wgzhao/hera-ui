@@ -1,4 +1,4 @@
-import { http } from "@/utils/http"
+import { http } from "@/utils/http";
 
 /**
 {
@@ -34,13 +34,34 @@ export type HistoryTask = {
 };
 
 type taskResults = {
-  message: string,
-  success: boolean,
-  data: Array<HistoryTask>
+  message: string;
+  success: boolean;
+  data: Array<HistoryTask>;
 };
 
 export const getAllTasks = (params?: map<any>) => {
   // status=all&dt=2024-11-15&operator=&_=1731654456641
   // current date
-  return http.request<taskResults>("get", "/jobManage/findJobHistoryByStatus", {params})
-}
+  return http.request<taskResults>("get", "/jobManage/findJobHistoryByStatus", {
+    params
+  });
+};
+
+export type JobHistoryResult = {
+  rows: Array<any>;
+  total: number;
+};
+
+export const getJobHistory = (jobId: number | string) => {
+  return http.request<JobHistoryResult>(
+    "get",
+    `/scheduleCenter/getJobHistory`,
+    {
+      params: {
+        pageSize: 10,
+        offset: 0,
+        jobId: jobId
+      }
+    }
+  );
+};
