@@ -2,14 +2,22 @@
   <!-- <MyTable :data="jobHistory" :columns="columns" /> -->
   <pure-table
     border
-    auto
+    fixed
     row-key="id"
     alignWhole="center"
     showOverflowTooltip
     size="default"
     :data="jobHistory"
     :columns="columns"
-  />
+  >
+    <template #status="{ row }">
+      <el-tag v-if="row.status == 'running'" type="primary">运行中</el-tag>
+      <el-tag v-else-if="row.status == 'success'" type="success">成功</el-tag>
+      <el-tag v-else-if="row.status == 'failed'" type="danger">失败</el-tag>
+      <el-tag v-else-if="row.status == 'wait'" type="warning">等待</el-tag>
+      <el-tag v-else>{{ row.status }}</el-tag>
+    </template>
+  </pure-table>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
@@ -22,8 +30,6 @@ defineOptions({
 });
 
 const { initToDetail, getParameter } = useDetail();
-
-initToDetail();
 
 const jobHistory = ref([]);
 const columns = [
@@ -50,19 +56,8 @@ const columns = [
   {
     prop: "status",
     label: "执行状态",
-    width: "80px"
-    // formatter: function (val) {
-    //     if (val === 'running') {
-    //         return '<a class="layui-btn layui-btn-xs" style="width: 100%;">' + val + '</a>';
-    //     }
-    //     if (val === 'success') {
-    //         return '<a class="layui-btn layui-btn-xs" style="width: 100%;background-color:#2f8f42" >' + val + '</a>';
-    //     }
-    //     if (val === 'wait') {
-    //         return '<a class="layui-btn layui-btn-xs layui-btn-warm" style="width: 100%;">' + val + '</a>';
-    //     }
-    //     return '<a class="layui-btn layui-btn-xs layui-btn-danger" style="width: 100%;" >' + val + '</a>'
-    // },
+    width: "80px",
+    slot: "status"
   },
   {
     prop: "operator",
@@ -109,21 +104,17 @@ const columns = [
   {
     prop: "status",
     label: "操作",
-    formatter: function (index, row) {
-      var html =
-        "<a href=\"javascript:cancelJob('" +
-        row["id"] +
-        "','" +
-        row["jobId"] +
-        "')\">取消任务</a>";
+    formatter: (row: any) => {
+      var html = `<el-button @click='cancelJob($row.id)'>取消任务</el-button>`;
       if (row["status"] == "running") {
         return html;
       }
     }
   }
 ];
+
 onMounted(() => {
-  console.log(getParameter.id);
+  initToDetail();
   getJobHistory(getParameter.id).then(res => {
     jobHistory.value = res.rows;
   });

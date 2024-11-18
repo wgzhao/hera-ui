@@ -12,13 +12,14 @@
         />
       </el-col>
       <el-col :span="5">
-        <el-text class="primary flex-auto">选择开始日期: </el-text>
+        <el-text class="primary flex-auto">开始日期: </el-text>
         <el-date-picker
           v-model="selectDate"
           type="date"
           placeholder="选择日期"
           format="YYYY-MM-DD"
           value-format="YYYY-MM-DD"
+          size="default"
           :editable="true"
           @change="fetchData"
         />
@@ -44,7 +45,7 @@
       @page-current-change="onCurrentChange"
     >
       <template #jobId="{ row }">
-        <el-text
+        <el-link
           type="primary"
           @click="
             toDetail(
@@ -54,7 +55,7 @@
               '历史任务详情'
             )
           "
-          >{{ row.jobId }}</el-text
+          >{{ row.jobId }}</el-link
         >
       </template>
     </pure-table>
@@ -195,12 +196,20 @@ const filterData = computed(() => {
     return result;
   }
 });
+
+type jobParams = {
+  status: string;
+  dt: string;
+  operator: string;
+};
+
 function fetchData() {
   //status=all&dt=2024-11-15&operator=&_=1731654456641
-  const params = {};
-  params.status = taskStatus.value || "all";
-  params.dt = selectDate.value || getTodayString();
-  params.operator = "";
+  const params: jobParams = {
+    status: taskStatus.value || "all",
+    dt: selectDate.value || getTodayString(),
+    operator: ""
+  };
   getAllTasks(params).then(res => {
     tasks.value = res.data;
     pagination.value.total = res.data.length;
