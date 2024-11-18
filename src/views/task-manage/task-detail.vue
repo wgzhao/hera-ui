@@ -1,5 +1,15 @@
 <template>
-  <!-- <MyTable :data="jobHistory" :columns="columns" /> -->
+  <div class="mb-2">
+    <el-row>
+      <el-col>
+        <el-input
+          v-model="search"
+          placeholder="Search..."
+          style="width: 200px"
+        />
+      </el-col>
+    </el-row>
+  </div>
   <pure-table
     border
     fixed
@@ -7,8 +17,11 @@
     alignWhole="center"
     showOverflowTooltip
     size="default"
-    :data="jobHistory"
+    :data="filterData"
     :columns="columns"
+    :pagination="pagination"
+    @page-size-change="onSizeChange"
+    @page-current-change="onCurrentChange"
   >
     <template #status="{ row }">
       <el-tag v-if="row.status == 'running'" type="primary">运行中</el-tag>
@@ -20,16 +33,21 @@
   </pure-table>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { getJobHistory } from "@/api/task-manage";
-// import MyTable from "@/components/MyTable.vue";
-import { useDetail } from "@/utils/tagHook";
+import { pagination, TriggerTypeList } from "./_utils";
 
 defineOptions({
   name: "TaskDetail"
 });
+const { jobId } = defineProps({
+  jobId: {
+    type: Number,
+    required: true
+  }
+});
 
-const { initToDetail, getParameter } = useDetail();
+const search = ref("");
 
 const jobHistory = ref([]);
 const columns = [
@@ -67,12 +85,12 @@ const columns = [
   {
     prop: "startTime",
     label: "开始时间",
-    width: "100px"
+    width: "200px"
   },
   {
     prop: "endTime",
     label: "结束时间",
-    width: "100px"
+    width: "200px"
   },
   {
     prop: "runTime",
@@ -83,27 +101,20 @@ const columns = [
 
   {
     prop: "illustrate",
-    label: "说明"
+    label: "说明",
+    width: "100px"
   },
   {
     prop: "triggerType",
     label: "触发类型",
+    width: "100px",
     formatter: (row: any) => {
-      if (row.triggerType == 1) {
-        return "自动调度";
-      }
-      if (row.triggerType == 2) {
-        return "手动触发";
-      }
-      if (row.triggerType == 3) {
-        return "手动恢复";
-      }
-      return row.triggerType;
+      return TriggerTypeList[row.triggerType] || row.triggerType;
     }
   },
   {
-    prop: "status",
     label: "操作",
+    width: "100px",
     formatter: (row: any) => {
       var html = `<el-button @click='cancelJob($row.id)'>取消任务</el-button>`;
       if (row["status"] == "running") {
@@ -112,11 +123,47 @@ const columns = [
     }
   }
 ];
+function onChange(val) {
+  pagination.value.size = val;
+  fetchData();
+}
 
-onMounted(() => {
-  initToDetail();
-  getJobHistory(getParameter.id).then(res => {
+function onSizeChange(val) {
+  pagination.value.pageSize = val;
+  fetchData();
+}
+
+function onCurrentChange(val) {
+  fetchData();
+}
+
+const filterData = computed(() => {
+  if (search.value === "") {
+    return jobHistory.value;
+  } else {
+    return jobHistory.value.filter((item: any) => {
+      return (
+        item.id.toString().includes(search.value) ||
+        item.actionId.toString().includes(search.value) ||
+        item.jobId.toString().includes(search.value) ||
+        item.executeHost.includes(search.value) ||
+        item.operator.includes(search.value) ||
+        item.startTime.includes(search.value) ||
+        item.endTime.includes(search.value)
+      );
+    });
+  }
+});
+
+function fetchData() {
+  const pageOffset =
+    (pagination.value.currentPage - 1) * pagination.value.pageSize;
+  getJobHistory(jobId, pagination.value.pageSize, pageOffset).then(res => {
     jobHistory.value = res.rows;
+    pagination.value.total = res.total;
   });
+}
+onMounted(() => {
+  fetchData();
 });
 </script>

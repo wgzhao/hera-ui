@@ -21,18 +21,18 @@ export default {
         showParent: true
       }
     },
-    {
-      path: "/task-manage/task-detail/:id",
-      name: "TaskDetail",
-      component: () => import("@/views/task-manage/task-detail.vue"),
-      meta: {
-        icon: "ep:memo",
-        title: "任务详情",
-        showParent: false,
-        showLink: false,
-        activePath: "/task-manage/task-list"
-      }
-    },
+    // {
+    //   path: "/task-manage/task-detail/:id",
+    //   name: "TaskDetail",
+    //   component: () => import("@/views/task-manage/task-detail.vue"),
+    //   meta: {
+    //     icon: "ep:memo",
+    //     title: "任务详情",
+    //     showParent: false,
+    //     showLink: false,
+    //     activePath: "/task-manage/task-list"
+    //   }
+    // },
     {
       path: "/task-manage/task-dag",
       name: "TaskDag",

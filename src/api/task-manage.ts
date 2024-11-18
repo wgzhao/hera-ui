@@ -52,14 +52,18 @@ export type JobHistoryResult = {
   total: number;
 };
 
-export const getJobHistory = (jobId: number | string) => {
+export const getJobHistory = (
+  jobId: number | string,
+  pageSize: number,
+  pageOffset: number
+) => {
   return http.request<JobHistoryResult>(
     "get",
     `/scheduleCenter/getJobHistory`,
     {
       params: {
-        pageSize: 10,
-        offset: 0,
+        pageSize: pageSize || 10,
+        offset: pageOffset || 0,
         jobId: jobId
       }
     }

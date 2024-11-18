@@ -25,7 +25,6 @@
         />
       </el-col>
     </el-row>
-    <!-- <MyTable :tableData="tasks" :columns="columns" :isEditable="false" /> -->
     <pure-table
       border
       row-key="id"
@@ -45,61 +44,38 @@
       @page-current-change="onCurrentChange"
     >
       <template #jobId="{ row }">
-        <el-link
-          type="primary"
-          @click="
-            toDetail(
-              { id: row.jobId },
-              '`/task-manage/task-detail/:id`',
-              'TaskDetail',
-              '历史任务详情'
-            )
-          "
-          >{{ row.jobId }}</el-link
-        >
+        <el-link type="primary" @click="toDetail(row.jobId)">{{
+          row.jobId
+        }}</el-link>
       </template>
     </pure-table>
   </div>
+
+  <el-dialog
+    v-model="showDialog"
+    align-center
+    destroy-on-close
+    draggable
+    title="信息日志"
+    width="80%"
+  >
+    <TaskDetail :jobId="jobId" />
+  </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed, watch, reactive } from "vue";
 import { Refresh } from "@element-plus/icons-vue";
 import { getAllTasks } from "@/api/task-manage";
-import MyTable from "@/components/MyTable/index.vue";
-import type { PaginationProps } from "@pureadmin/table";
-import { useDetail } from "@/utils/tagHook";
+import TaskDetail from "./task-detail.vue";
+import { pagination, taskStatus } from "./_utils";
 
 const tasks = ref([]);
-const pagination = ref<PaginationProps>({
-  pageSize: 10,
-  currentPage: 1,
-  total: 0,
-  align: "right",
-  background: false,
-  size: "default"
-});
+const jobId = ref();
 
-const allStatus = [
-  { value: "all", text: "全部" },
-  { value: "failed", text: "失败" },
-  { value: "success", text: "成功" },
-  { value: "running", text: "运行中" },
-  { value: "wait", text: "等待" }
-];
-
-const { toDetail, router } = useDetail();
-
-// const last7days = Array.from({ length: 7 }, (_, i) => {
-//   const date = new Date();
-//   date.setDate(date.getDate() - i);
-//   return {
-//     value: date.toLocaleDateString("en-CA"),
-//     text: date.toLocaleDateString("en-CA")
-//   };
-// });
+const showDialog = ref(false);
 
 const search = ref();
-const taskStatus = ref("all");
+const selectedStatus = ref("all");
 // set today
 const selectDate = ref(getTodayString());
 
@@ -146,15 +122,12 @@ const columns = [
     label: "执行状态",
     width: "100px",
     formatter: (row: any) => {
-      return row.status === "success"
-        ? "成功"
-        : row.status === "failed"
-          ? "失败"
-          : row.status === "running"
-            ? "运行中"
-            : "等待";
+      return (
+        taskStatus.find(item => item.value === row.status)?.text || row.status
+      );
     },
-    filters: allStatus,
+    filters: taskStatus,
+    filterMultiple: false,
     filterMethod: (value, row) => {
       return row.status === value;
     }
@@ -203,10 +176,15 @@ type jobParams = {
   operator: string;
 };
 
+function toDetail(val: number) {
+  console.log("toDetail", val);
+  jobId.value = val;
+  showDialog.value = true;
+}
 function fetchData() {
   //status=all&dt=2024-11-15&operator=&_=1731654456641
   const params: jobParams = {
-    status: taskStatus.value || "all",
+    status: selectedStatus.value || "all",
     dt: selectDate.value || getTodayString(),
     operator: ""
   };
