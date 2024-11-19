@@ -72,4 +72,79 @@ export const getJobHistory = (
 
 export const getJobLog = (id: number) => {
    return http.request("get", `/scheduleCenter/getLog?id=${id}`);
+};
+
+export const cancelSpecifiedTask = (id: number, jobId: number ) => {
+  return http.request("get", `/scheduleCenter/cancelTask?id=${id}&jobId=${jobId}`);
+}
+
+export type JobNode = {
+  nodeName: number;
+  remark: string;
+  auto: number | null
+};
+
+export type JobDepsResult = {
+  success: boolean;
+  message: string;
+  data: {
+    headNode: JobNode;
+    edges: [{
+      nodeA: JobNode;
+      nodeB: JobNode;
+    }];
+  }
+}
+export type JobGraphNode = {
+  nodes: Array<JobNode>;
+  links: [{
+    source: number;
+    target: number;
+  }],
+  categories: [{
+    name: string;
+  }]
+};
+
+export const getJobDependencies = async (jobId: number, depType: number) => {
+  // depType: 0 - impact, 1 - progress
+  const resp = await http.request<JobDepsResult>("post", `/scheduleCenter/getJobImpactOrProgress`, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+    },
+    data: {
+      jobId: jobId,
+      type: depType
+    }
+  });
+  if (resp.success) {
+    const graphResult  = {
+      nodes: [],
+      links: [],
+      categories: []
+    } as JobGraphNode;
+    graphResult.nodes.push(resp.data.headNode);
+    resp.data.edges.forEach(edge => {
+      // judge if the node is already in the nodes
+      // if not, add it to the nodes
+      if (!graphResult.nodes.find(node => node.nodeName === edge.nodeA.nodeName)) {
+        graphResult.nodes.push(edge.nodeA);
+        graphResult.categories.push({"name": edge.nodeA.nodeName});
+      }
+      if (!graphResult.nodes.find(node => node.nodeName === edge.nodeB.nodeName)) {
+        graphResult.nodes.push(edge.nodeB);
+        graphResult.categories.push({"name": edge.nodeA.nodeName});
+      }
+      // graphResult.nodes.push(edge.nodeA, edge.nodeB);
+      graphResult.links.push({source: edge.nodeA.nodeName, target: edge.nodeB.nodeName})
+    });
+
+    // graphResult.categories = [{
+    //   name: "headNode"
+    // }];
+    return graphResult;
+  } else {
+    return null;
+  }
+  return null;
 }

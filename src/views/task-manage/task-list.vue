@@ -1,48 +1,29 @@
 <template>
-  <div>
+  <div class="mt-2">
     <el-row class="mb-1">
-      <el-col :span="2"
-        ><el-button :icon="Refresh" type="primary" @click="fetchData"
-      /></el-col>
+      <el-col :span="2"><el-button :icon="Refresh" type="primary" @click="fetchData" /></el-col>
       <el-col :span="4">
-        <el-input
-          v-model="search"
-          placeholder="Search..."
-          style="width: 200px"
-        />
+        <el-input v-model="search" placeholder="Search..." style="width: 200px" />
       </el-col>
       <el-col :span="5">
-        <el-text class="primary flex-auto">开始日期: </el-text>
-        <el-date-picker
-          v-model="selectDate"
-          type="date"
-          placeholder="选择日期"
-          format="YYYY-MM-DD"
-          value-format="YYYY-MM-DD"
-          size="default"
-          :editable="true"
-          @change="fetchData"
-        />
+        <el-text class="primary flex-auto">开始日期</el-text>
+        <el-date-picker v-model="selectDate" type="date" placeholder="选择日期" format="YYYY-MM-DD" value-format="YYYY-MM-DD"
+          size="default" :editable="true" @change="fetchData" />
+      </el-col>
+      <el-col :span="5">
+        <el-text class="primary flex-auto pr-2">任务状态</el-text>
+        <el-select style="width: 100px" v-model="selectedStatus" placeholder="选择任务状态" size="default" @change="fetchData">
+          <el-option v-for="item in taskStatus" :key="item.value" :value="item.value" :label="item.text" />
+        </el-select>
       </el-col>
     </el-row>
-    <pure-table
-      border
-      row-key="id"
-      alignWhole="center"
-      showOverflowTooltip
-      size="default"
-      :height="pagination.pageSize * 45 + 20"
-      :data="
-        filterData.slice(
-          (pagination.currentPage - 1) * pagination.pageSize,
-          pagination.currentPage * pagination.pageSize
-        )
-      "
-      :columns="columns"
-      :pagination="pagination"
-      @page-size-change="onSizeChange"
-      @page-current-change="onCurrentChange"
-    >
+    <pure-table border row-key="id" alignWhole="center" showOverflowTooltip size="default"
+      :height="pagination.pageSize * 45 + 20" :data="filterData.slice(
+        (pagination.currentPage - 1) * pagination.pageSize,
+        pagination.currentPage * pagination.pageSize
+      )
+        " :columns="columns" :pagination="pagination" @page-size-change="onSizeChange"
+      @page-current-change="onCurrentChange">
       <template #jobId="{ row }">
         <el-link type="primary" @click="toDetail(row.jobId)">{{
           row.jobId
@@ -51,14 +32,7 @@
     </pure-table>
   </div>
 
-  <el-dialog
-    v-model="showDialog"
-    align-center
-    destroy-on-close
-    draggable
-    title="信息日志"
-    width="80%"
-  >
+  <el-dialog v-model="showDialog" align-center destroy-on-close draggable title="信息日志" width="80%">
     <TaskDetail :jobId="jobId" />
   </el-dialog>
 </template>
@@ -125,11 +99,6 @@ const columns = [
       return (
         taskStatus.find(item => item.value === row.status)?.text || row.status
       );
-    },
-    filters: taskStatus,
-    filterMultiple: false,
-    filterMethod: (value, row) => {
-      return row.status === value;
     }
   },
   {

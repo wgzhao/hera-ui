@@ -2,29 +2,14 @@
   <div class="mb-2">
     <el-row>
       <el-col>
-        <el-input
-          v-model="search"
-          placeholder="Search..."
-          style="width: 200px"
-        />
+        <el-input v-model="search" placeholder="Search..." style="width: 200px" />
       </el-col>
     </el-row>
   </div>
-  <pure-table
-    border
-    fixed
-    row-key="id"
-    showOverflowTooltip
-    alignWhole="center"
-    size="default"
-    :data="filterData"
-    :columns="columns"
-    :pagination="pagination"
-    @page-current-change="onCurrentChange"
-    @page-size-change="onSizeChange"
-  >
-  <template #log="{row}">
-      <el-link :icon="Plus" @click="getLog(row.id)"> </el-link>
+  <pure-table border fixed stripe row-key="id" showOverflowTooltip alignWhole="center" size="default" :data="filterData"
+    :columns="columns" :pagination="pagination" @page-current-change="onCurrentChange" @page-size-change="onSizeChange">
+    <template #log="{ row }">
+      <el-link type="primary" @click="getLog(row.id)"> {{ row.id }}</el-link>
     </template>
     <template #status="{ row }">
       <el-tag v-if="row.status == 'running'" type="primary">运行中</el-tag>
@@ -33,19 +18,30 @@
       <el-tag v-else-if="row.status == 'wait'" type="warning">等待</el-tag>
       <el-tag v-else>{{ row.status }}</el-tag>
     </template>
+    <template #operation="{ row }">
+      <el-button @click="cancelTask(row.id, row.jobId)" v-if="row.status == 'running'">取消任务</el-button>
+    </template>
   </pure-table>
+  <el-dialog modal v-model="showLog" fullscreen title="任务运行日志">
+  <el-divider />
+    <el-text class="mx-1" size="small">
+      <pre>
+  {{ currLog }}
+  </pre>
+    </el-text>
+  </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
-import { getJobHistory, getJobLog } from "@/api/task-manage";
+import { ElMessage } from 'element-plus'
+import { getJobHistory, getJobLog, cancelSpecifiedTask } from "@/api/task-manage";
 import { pagination, TriggerTypeList } from "./_utils";
-import { Plus } from '@element-plus/icons-vue';
 
 defineOptions({
   name: "TaskDetail"
 });
 const { jobId } = defineProps({
-    type: Number,
+  type: Number,
   jobId: {
     required: true
   }
@@ -54,20 +50,14 @@ const { jobId } = defineProps({
 const search = ref("");
 
 const jobHistory = ref([]);
+const showLog = ref(false);
+const currLog = ref("");
 const columns = [
   {
-    prop: "",
-    label: "",
-    width: "50px",
-    slot: "log"
-  {
-  },
     prop: "id",
     label: "id",
     width: "100px",
-    cellRenderer: ({row: any}j) => (
-      <el-link @click=getLog(row.id)>{row.id}</el-link>
-      )
+    slot: "log"
   },
   {
     prop: "actionId",
@@ -128,12 +118,7 @@ const columns = [
   {
     label: "操作",
     width: "100px",
-    formatter: (row: any) => {
-      var html = `<el-button @click='cancelJob($row.id)'>取消任务</el-button>`;
-      if (row["status"] == "running") {
-        return html;
-      }
-    }
+    slot: "operation"
   }
 ];
 function onChange(val) {
@@ -178,8 +163,17 @@ function fetchData() {
 };
 
 function getLog(id: number) {
-  getJobLog(id).then(res => alert(res.log)) ;
+  getJobLog(id).then(res => {
+    currLog.value = res.log;
+    showLog.value = true;
+  });
 };
+
+function cancelTask(id: number, jobId: number) {
+  cancelSpecifiedTask(id, jobId).then(res => {
+    ElMessage(res.data);
+  })
+}
 onMounted(() => {
   fetchData();
 });
