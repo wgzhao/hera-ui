@@ -1,4 +1,5 @@
 import { http } from "@/utils/http";
+import { toRaw } from '@vue/reactivity';
 
 /**
 {
@@ -79,7 +80,7 @@ export const cancelSpecifiedTask = (id: number, jobId: number ) => {
 }
 
 export type JobNode = {
-  nodeName: number;
+  name: number;
   remark: string;
   auto: number | null
 };
@@ -96,7 +97,7 @@ export type JobDepsResult = {
   }
 }
 export type JobGraphNode = {
-  nodes: Array<JobNode>;
+  nodes: JobNode[];
   links: [{
     source: number;
     target: number;
@@ -118,27 +119,40 @@ export const getJobDependencies = async (jobId: number, depType: number) => {
     }
   });
   if (resp.success) {
-    const graphResult  = {
+    const graphResult = {
       nodes: [],
       links: [],
       categories: []
-    } as JobGraphNode;
-    graphResult.nodes.push(resp.data.headNode);
+    };
+    const ids: Set<number> = new Set<number>();
+    ids.add(0);
+    graphResult.nodes.push({id: 0, name: "start"});
     resp.data.edges.forEach(edge => {
       // judge if the node is already in the nodes
       // if not, add it to the nodes
-      if (!graphResult.nodes.find(node => node.nodeName === edge.nodeA.nodeName)) {
-        graphResult.nodes.push(edge.nodeA);
+      if (!ids.has(edge.nodeA.nodeName)) {
+        graphResult.nodes.push(
+          {
+            id: edge.nodeA.nodeName,
+            name: edge.nodeA.remark.split("\n")[1]
+          }
+        );
+        ids.add(edge.nodeA.nodeName)
         graphResult.categories.push({"name": edge.nodeA.nodeName});
       }
-      if (!graphResult.nodes.find(node => node.nodeName === edge.nodeB.nodeName)) {
-        graphResult.nodes.push(edge.nodeB);
+      if (!ids.has(edge.nodeB.nodeName)) {
+        graphResult.nodes.push(
+          {
+            id: edge.nodeB.nodeName,
+            name:edge.nodeB.remark.split("\n")[1]
+          }
+        );
+        ids.add(edge.nodeB.nodeName);
         graphResult.categories.push({"name": edge.nodeA.nodeName});
       }
       // graphResult.nodes.push(edge.nodeA, edge.nodeB);
       graphResult.links.push({source: edge.nodeA.nodeName, target: edge.nodeB.nodeName})
     });
-
     // graphResult.categories = [{
     //   name: "headNode"
     // }];

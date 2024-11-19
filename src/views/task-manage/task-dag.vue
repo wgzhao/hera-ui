@@ -9,22 +9,24 @@
     </el-row>
     <!-- dependencies display -->
     <div class="graph-card" style="min-width: 600px">
-      <JobDepsGraph :jobId="jobId" :depType="jobType" v-show="showDeps" />
+      <JobDepsGraph :data="jobDeps" v-if="showDeps" />
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-
+import { type JobGraphNode, getJobDependencies } from '@/api/task-manage'
 import JobDepsGraph from './components/charts/JobDepsGraph.vue';
 
 const jobId = ref(1565);
-const jobType = ref(0);
 
 const showDeps = ref(false)
+const jobDeps = ref({});
 
 function getJobDeps(depType: number) {
-  jobType.value = depType;
-  showDeps.value = true;
+  getJobDependencies(jobId.value, depType).then(res => {
+    jobDeps.value = {...res};
+    showDeps.value = true;
+  })
 }
 </script>
