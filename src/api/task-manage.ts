@@ -69,3 +69,7 @@ export const getJobHistory = (
     }
   );
 };
+
+export const getJobLog = (id: number) => {
+   return http.request("get", `/scheduleCenter/getLog?id=${id}`);
+}

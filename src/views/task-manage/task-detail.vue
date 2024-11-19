@@ -14,15 +14,18 @@
     border
     fixed
     row-key="id"
-    alignWhole="center"
     showOverflowTooltip
+    alignWhole="center"
     size="default"
     :data="filterData"
     :columns="columns"
     :pagination="pagination"
-    @page-size-change="onSizeChange"
     @page-current-change="onCurrentChange"
+    @page-size-change="onSizeChange"
   >
+  <template #log="{row}">
+      <el-link :icon="Plus" @click="getLog(row.id)"> </el-link>
+    </template>
     <template #status="{ row }">
       <el-tag v-if="row.status == 'running'" type="primary">运行中</el-tag>
       <el-tag v-else-if="row.status == 'success'" type="success">成功</el-tag>
@@ -34,27 +37,37 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
-import { getJobHistory } from "@/api/task-manage";
+import { getJobHistory, getJobLog } from "@/api/task-manage";
 import { pagination, TriggerTypeList } from "./_utils";
+import { Plus } from '@element-plus/icons-vue';
 
 defineOptions({
   name: "TaskDetail"
 });
 const { jobId } = defineProps({
-  jobId: {
     type: Number,
+  jobId: {
     required: true
   }
-});
 
+});
 const search = ref("");
 
 const jobHistory = ref([]);
 const columns = [
   {
+    prop: "",
+    label: "",
+    width: "50px",
+    slot: "log"
+  {
+  },
     prop: "id",
     label: "id",
-    width: "100px"
+    width: "100px",
+    cellRenderer: ({row: any}j) => (
+      <el-link @click=getLog(row.id)>{row.id}</el-link>
+      )
   },
   {
     prop: "actionId",
@@ -162,7 +175,11 @@ function fetchData() {
     jobHistory.value = res.rows;
     pagination.value.total = res.total;
   });
-}
+};
+
+function getLog(id: number) {
+  getJobLog(id).then(res => alert(res.log)) ;
+};
 onMounted(() => {
   fetchData();
 });
