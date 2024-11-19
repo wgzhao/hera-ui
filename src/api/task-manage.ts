@@ -1,5 +1,5 @@
 import { http } from "@/utils/http";
-import { toRaw } from '@vue/reactivity';
+import { toRaw } from "@vue/reactivity";
 
 /**
 {
@@ -72,17 +72,20 @@ export const getJobHistory = (
 };
 
 export const getJobLog = (id: number) => {
-   return http.request("get", `/scheduleCenter/getLog?id=${id}`);
+  return http.request("get", `/scheduleCenter/getLog?id=${id}`);
 };
 
-export const cancelSpecifiedTask = (id: number, jobId: number ) => {
-  return http.request("get", `/scheduleCenter/cancelTask?id=${id}&jobId=${jobId}`);
-}
+export const cancelSpecifiedTask = (id: number, jobId: number) => {
+  return http.request(
+    "get",
+    `/scheduleCenter/cancelTask?id=${id}&jobId=${jobId}`
+  );
+};
 
 export type JobNode = {
   name: number;
   remark: string;
-  auto: number | null
+  auto: number | null;
 };
 
 export type JobDepsResult = {
@@ -90,34 +93,44 @@ export type JobDepsResult = {
   message: string;
   data: {
     headNode: JobNode;
-    edges: [{
-      nodeA: JobNode;
-      nodeB: JobNode;
-    }];
-  }
-}
+    edges: [
+      {
+        nodeA: JobNode;
+        nodeB: JobNode;
+      }
+    ];
+  };
+};
 export type JobGraphNode = {
   nodes: JobNode[];
-  links: [{
-    source: number;
-    target: number;
-  }],
-  categories: [{
-    name: string;
-  }]
+  links: [
+    {
+      source: number;
+      target: number;
+    }
+  ];
+  categories: [
+    {
+      name: string;
+    }
+  ];
 };
 
 export const getJobDependencies = async (jobId: number, depType: number) => {
   // depType: 0 - impact, 1 - progress
-  const resp = await http.request<JobDepsResult>("post", `/scheduleCenter/getJobImpactOrProgress`, {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-    },
-    data: {
-      jobId: jobId,
-      type: depType
+  const resp = await http.request<JobDepsResult>(
+    "post",
+    `/scheduleCenter/getJobImpactOrProgress`,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+      },
+      data: {
+        jobId: jobId,
+        type: depType
+      }
     }
-  });
+  );
   if (resp.success) {
     const graphResult = {
       nodes: [],
@@ -126,32 +139,31 @@ export const getJobDependencies = async (jobId: number, depType: number) => {
     };
     const ids: Set<number> = new Set<number>();
     ids.add(0);
-    graphResult.nodes.push({id: 0, name: "start"});
+    graphResult.nodes.push({ id: 0, name: "start" });
     resp.data.edges.forEach(edge => {
       // judge if the node is already in the nodes
       // if not, add it to the nodes
       if (!ids.has(edge.nodeA.nodeName)) {
-        graphResult.nodes.push(
-          {
-            id: edge.nodeA.nodeName,
-            name: edge.nodeA.remark.split("\n")[1]
-          }
-        );
-        ids.add(edge.nodeA.nodeName)
-        graphResult.categories.push({"name": edge.nodeA.nodeName});
+        graphResult.nodes.push({
+          id: edge.nodeA.nodeName,
+          name: edge.nodeA.nodeName
+        });
+        ids.add(edge.nodeA.nodeName);
+        graphResult.categories.push({ name: edge.nodeA.nodeName });
       }
       if (!ids.has(edge.nodeB.nodeName)) {
-        graphResult.nodes.push(
-          {
-            id: edge.nodeB.nodeName,
-            name:edge.nodeB.remark.split("\n")[1]
-          }
-        );
+        graphResult.nodes.push({
+          id: edge.nodeB.nodeName,
+          name: edge.nodeB.nodeName
+        });
         ids.add(edge.nodeB.nodeName);
-        graphResult.categories.push({"name": edge.nodeA.nodeName});
+        graphResult.categories.push({ name: edge.nodeA.nodeName });
       }
       // graphResult.nodes.push(edge.nodeA, edge.nodeB);
-      graphResult.links.push({source: edge.nodeA.nodeName, target: edge.nodeB.nodeName})
+      graphResult.links.push({
+        source: edge.nodeA.nodeName,
+        target: edge.nodeB.nodeName
+      });
     });
     // graphResult.categories = [{
     //   name: "headNode"
@@ -161,4 +173,4 @@ export const getJobDependencies = async (jobId: number, depType: number) => {
     return null;
   }
   return null;
-}
+};
