@@ -12,7 +12,7 @@ export type Processor = {
 };
 
 export type HeraJob = {
-  id: int;
+  id: number;
   auto: String;
   configs: Map<String, String>;
   cronExpression: String;
@@ -21,7 +21,7 @@ export type HeraJob = {
   description: String;
   gmtCreate: Date;
   gmtModified: Date;
-  groupId: Integer;
+  groupId: number;
   historyId: String;
   host: String;
   lastEndTime: Date;
@@ -34,17 +34,17 @@ export type HeraJob = {
   readyDependency: String;
   resources: Array<Map<String, String>>;
   runType: JobRunTypeEnum;
-  scheduleType: Integer;
+  scheduleType: number;
   script: String;
   startTime: Date;
-  startTimestamp: Long;
+  startTimestamp: number;
   statisticEndTime: Date;
   statisticStartTime: Date;
   status: String;
   timezone: String;
-  hostGroupId: int;
+  hostGroupId: number;
   hostGroupName: String;
-  mustEndMinute: Long;
+  mustEndMinute: number;
   rollBackTimes: String;
   rollBackWaitTime: String;
   runPriorityLevel: String;
@@ -55,16 +55,16 @@ export type HeraJob = {
   uIdS: String;
   areaId: String;
   focusUser: String;
-  repeatRun: short;
+  repeatRun: number;
 };
 
 export type  HeraJobTree = {
   id: String;
   parent: String;
   name: String;
-  directory: Integer;
+  directory: number;
   jobName: String;
-  jobId: Integer;
+  jobId: number;
   jobDescription: String;
   owner: String;
   dependence: String;
