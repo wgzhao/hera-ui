@@ -1,15 +1,15 @@
 import { http } from "@/utils/http";
 
-export enum JobRunTypeEnum = {
+export enum JobRunTypeEnum  {
   Shell = "shell",
   Hive = "hive",
   Impala = "impala"
-}；
+};
 
 export type Processor = {
   jobId: string;
   config: Map<string, string>;
-}；
+};
 
 export type HeraJob = {
   id: int;
@@ -74,4 +74,8 @@ export type  HeraJobTree = {
 
 export const initJobTree = () => {
   return http.request<Map<String, Array<HeraJobTree>>("post", "/scheduleCenter/init")
+}
+
+export const getJobMessage = (jobId: number) => {
+  return http.request("get", `/scheduleCenter/getJobMessage?jobId=${jobId}`);
 }

@@ -20,7 +20,7 @@
       >
     </el-row>
     <!-- dependencies display -->
-    <div class="mt-10" style="width: 100%">
+    <div class="mt-10" style="width: 100%; min-height: 600px;">
       <!-- <JobDepsGraph :data="jobDeps" v-if="showDeps" /> -->
       <taskGraph :jobId="jobId" :graphType="graphType" v-if="showDeps" />
     </div>
@@ -31,17 +31,18 @@ import { ref } from "vue";
 import { type JobGraphNode, getJobDependencies } from "@/api/task-manage";
 import JobDepsGraph from "./components/charts/JobDepsGraph.vue";
 import taskGraph from "./components/charts/taskGraph.vue";
-const jobId = ref(0);
+const jobId = ref(1565);
 const graphType = ref(0);
 
 const showDeps = ref(false);
 const jobDeps = ref({});
 
 function getJobDeps(depType: number) {
+  showDeps.value = false;
   graphType.value = depType;
   showDeps.value = true;
   // getJobDependencies(jobId.value, depType).then(res => {
-  //   jobDeps.value = { ...res };
+  //   jobDeps.value = res;
   //   showDeps.value = true;
   // });
 }

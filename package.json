@@ -34,6 +34,8 @@
     "url": "https://github.com/xiaoxian521"
   },
   "dependencies": {
+    "@codemirror/lang-sql": "^6.8.0",
+    "@codemirror/theme-one-dark": "^6.1.2",
     "@pureadmin/descriptions": "^1.2.1",
     "@pureadmin/table": "^3.2.0",
     "@pureadmin/utils": "^2.4.8",
@@ -60,6 +62,7 @@
     "sass-migrator": "^2.2.1",
     "sortablejs": "^1.15.2",
     "vue": "^3.4.38",
+    "vue-codemirror": "^6.1.1",
     "vue-router": "^4.4.3",
     "vue-tippy": "^6.4.4",
     "vue-types": "^5.1.3"

@@ -109,12 +109,25 @@ export type JobGraphNode = {
       target: number;
     }
   ];
-  categories: [
-    {
-      name: string;
-    }
-  ];
+  categories: [];
 };
+interface Coordinate {
+  x: number;
+  y: number;
+}
+
+const xRange: [number, number] = [0, 1000];
+const yRange: [number, number] = [-10, 600];
+
+function getRandomInRange(min: number, max: number): number {
+  return Math.random() * (max - min) + min;
+}
+
+function generateRandomCoordinate(xRange: [number, number], yRange: [number, number]): Coordinate {
+  const x = getRandomInRange(xRange[0], xRange[1]);
+  const y = getRandomInRange(yRange[0], yRange[1]);
+  return { x, y };
+}
 
 export const getJobDependencies = async (jobId: number, depType: number) => {
   // depType: 0 - impact, 1 - progress
@@ -144,26 +157,42 @@ export const getJobDependencies = async (jobId: number, depType: number) => {
       // judge if the node is already in the nodes
       // if not, add it to the nodes
       if (!ids.has(edge.nodeA.nodeName)) {
+        const randomCoordinate = generateRandomCoordinate(xRange, yRange);
         graphResult.nodes.push({
-          id: edge.nodeA.nodeName,
-          name: edge.nodeA.nodeName
+          name: `${edge.nodeA.nodeName}`,
+          x: randomCoordinate.x,
+          y: randomCoordinate.y
         });
         ids.add(edge.nodeA.nodeName);
-        graphResult.categories.push({ name: edge.nodeA.nodeName });
       }
       if (!ids.has(edge.nodeB.nodeName)) {
+        const randomCoordinate = generateRandomCoordinate(xRange, yRange);
         graphResult.nodes.push({
-          id: edge.nodeB.nodeName,
-          name: edge.nodeB.nodeName
+          name: `${edge.nodeB.nodeName}`,
+          x: randomCoordinate.x,
+          y: randomCoordinate.y
         });
         ids.add(edge.nodeB.nodeName);
-        graphResult.categories.push({ name: edge.nodeA.nodeName });
       }
+      // add category
+     if (graphResult.categories.indexOf(edge.nodeA.nodeName) === -1) {
+        graphResult.categories.push(edge.nodeA.nodeName);
+      }
+     if (graphResult.categories.indexOf(edge.nodeB.nodeName) === -1){
+       graphResult.categories.push(edge.nodeB.nodeName);
+     }
       // graphResult.nodes.push(edge.nodeA, edge.nodeB);
+      if (depType == 0) {
       graphResult.links.push({
-        source: edge.nodeA.nodeName,
-        target: edge.nodeB.nodeName
-      });
+        source: `${edge.nodeA.nodeName}`,
+        target: `${edge.nodeB.nodeName}`
+      })
+      } else {
+        graphResult.links.push({
+          target: `${edge.nodeA.nodeName}`,
+          source: `${edge.nodeB.nodeName}`
+        })
+      }
     });
     // graphResult.categories = [{
     //   name: "headNode"

@@ -1,13 +1,10 @@
 <template>
-  <div ref="chartRef" style="width: 100%; height: 365px" />
+  <div ref="chartRef" style="width: 100%; height: 1000px" />
 </template>
 <script setup lang="ts">
 import { useDark, useECharts } from "@pureadmin/utils";
 import type { GraphSeriesOption } from "echarts/charts";
 import { ref, computed, watch, nextTick } from "vue";
-import { graph } from "./les-miserables";
-import { treeData } from "./treeData";
-
 const props = defineProps(["data"]);
 
 const { isDark } = useDark();
@@ -39,21 +36,30 @@ watch(
         {
           name: "任务依赖关系图",
           type: "graph",
-          layout: "force",
+          layout: "none",
           symbolSize: 20,
           edgeSymbol: ["circle", "arrow"],
           edgeSymbolSize: [4, 10],
           data: props.data.nodes,
           links: props.data.links,
+          categories: props.data.categories,
           roam: true,
+          labelLayout: {
+            hideOverlap: true
+          },
+          scaleLimit: {
+            min: 0.4,
+            max: 2
+          },
           label: {
             position: "right",
             formatter: "{b}",
-            show: false
+            show: true
           },
           lineStyle: {
-            color: "#2f4554",
-            curveness: 0.3
+            color: "source",
+            curveness: 0.3,
+            width: 1
           },
           emphasis: {
             focus: "adjacency",
@@ -64,8 +70,7 @@ watch(
         }
       ]
     };
-    console.log(props.data.nodes);
-    console.log(props.data.links);
+    console.log(options);
     setOptions(options);
   },
   {

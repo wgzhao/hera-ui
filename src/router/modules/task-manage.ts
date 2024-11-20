@@ -4,7 +4,7 @@ export default {
   path: "/task-manage",
   name: "TaskManage",
   component: Layout,
-  redirect: "/task-manage/task-detail",
+  redirect: "/task-manage/task-list",
   meta: {
     icon: "ep:menu",
     title: "任务管理",

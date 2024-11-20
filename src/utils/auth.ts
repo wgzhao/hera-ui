@@ -58,6 +58,9 @@ export function setToken(data: DataInfo<Date>) {
       })
     : Cookies.set(TokenKey, cookieString);
 
+  // Monkey Patch
+  Cookies.set("accessToken", accessToken);
+
   Cookies.set(
     multipleTabsKey,
     "true",

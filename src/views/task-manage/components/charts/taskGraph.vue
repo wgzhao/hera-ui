@@ -50,8 +50,9 @@ function addEdge(nodeA, nodeB, label) {
   g.setEdge(nodeA, nodeB, {
     label: label,
     style: "stroke: #70baff; fill: none; stroke-width: 2px", // 连线样式
-    arrowheadStyle: "fill: #70baff;stroke: #70baff;", //箭头样式,可以设置箭头颜色
-    arrowhead: "vee" //箭头形状,可以设置 normal,vee,undirected 三种样式,默认为 normal
+    // arrowheadStyle: "fill: #70baff;stroke: #70baff;", //箭头样式,可以设置箭头颜色
+    arrowhead: "vee", //箭头形状,可以设置 normal,vee,undirected 三种样式,默认为 normal
+    curve: d3.curveBasis
   });
 }
 function initDate(data) {
@@ -150,7 +151,7 @@ function addEdgeToGraph(edge) {
 
   if (g.node(src.nodeName) == undefined) {
     var srcRemarkColor = getColor(src.auto, src.remark);
-    addNode(src), srcRemarkColor;
+    addNode(src, srcRemarkColor);
   }
   if (g.node(target.nodeName) == undefined) {
     var targetRemarkColor = getColor(target.auto, target.remark);
