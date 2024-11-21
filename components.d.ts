@@ -56,6 +56,7 @@ declare module 'vue' {
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElTree: typeof import('element-plus/es')['ElTree']
     MyTable: typeof import('./src/components/MyTable/index.vue')['default']
+    PlusForm: typeof import('plus-pro-components/es')['PlusForm']
     PlusTable: typeof import('plus-pro-components/es')['PlusTable']
     ReDialog: typeof import('./src/components/ReDialog/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

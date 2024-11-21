@@ -17,7 +17,7 @@
         </div>
       </el-aside>
       <el-main>
-        <el-card>
+        <!-- <el-card>
           <template #header>
             <div class="card-header">
               <h3 class="text-center">基本信息</h3>
@@ -103,18 +103,28 @@
                   <el-input v-model="form.description"></el-input> </el-form-item></el-col>
               <el-col :span="8">
                 <el-form-item label="预计时长:">
-                  <!-- <el-input v-model="form.estimatedTime"></el-input> -->
-                </el-form-item></el-col>
-            </el-row>
-
-            <el-row>
-              <el-col :span="24">
-                <!-- <el-input v-model="form.script" autosize type="area" /> -->
-                <codemirror v-model="form.script" :tabSize="2" :extensions="extensions" />
-              </el-col>
-            </el-row>
-          </el-form>
-        </el-card>
+        </el-form-item></el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <codemirror v-model="form.script" :tabSize="2" :extensions="extensions" />
+          </el-col>
+        </el-row>
+        </el-form>
+        </el-card> -->
+        <PlusForm v-model="form" :hasFooter="false" :group="depColumn" :row-props="{ gutter: 0 }"
+          :col-props="{ span: 8 }">
+          <template #plus-field-script>
+            <codemirror v-model="form.script" :tabSize="2" :extensions="extensions" />
+          </template>
+          <template #plus-field-inheritConfig>
+            <ul>
+              <li v-for="(k, v) in form.inheritConfig">
+                {{ k }}={{ v }}
+              </li>
+            </ul>
+          </template>
+        </PlusForm>
       </el-main>
     </el-container>
   </div>
@@ -129,7 +139,7 @@ import { sql } from "@codemirror/lang-sql";
 import { initJobTree, getJobMessage } from "@/api/schedule-center";
 import type { HeraJob } from "@/api/schedule-center";
 import { scheduleJob } from "./_data";
-
+import { depColumn, cronColumn } from './_heraJobColumn';
 
 interface Tree {
   label: string;
@@ -151,8 +161,6 @@ const form = ref<FieldValues>({});
 const zNodes = ref({});
 
 const treeRef = ref<InstanceType<typeof ElTree>>();
-
-const { isDark } = useDark();
 
 const extensions = [sql()];
 function filterNode(value: string, data: Tree) {
