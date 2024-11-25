@@ -6,9 +6,12 @@ interface Tree {
   label: string;
   children?: Tree[];
 }
+
 defineOptions({
   name: "JobTree"
 });
+
+const operateType = defineModel();
 
 const defaultProps = {
   children: "children",
@@ -23,6 +26,7 @@ function handleNodeClick(data: Tree) {
     // click leaf node
     operateType.value = "jobOperate";
     const jobId = parseInt(data.label.split("(")[1].slice(0, -1));
+    $emit(updateForm, jobId);
     getJobMessage(jobId).then(res => {
       form.value = res;
       if (res.scheduleType == 0) {
