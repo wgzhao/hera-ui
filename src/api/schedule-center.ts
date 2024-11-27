@@ -79,3 +79,7 @@ export const initJobTree = () => {
 export const getJobMessage = (jobId: number) => {
   return http.request("get", `/scheduleCenter/getJobMessage?jobId=${jobId}`);
 }
+
+export const getJobOperators = (jobId: number) => {
+  return http.request("get", `/scheduleCenter/getJobOperator?jobId${jobId}&type=false`)
+}

@@ -1,16 +1,14 @@
 import type {
-  PlusColumn,
-  FieldValues,
-  PlusFormGroupRow
+  PlusColumn
 } from "plus-pro-components";
+
+
 function deepCopy<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
 // 任务基本信息字段
-const baseColumn: PlusFormGroupRow[] = [
-  {
-    title: "基本信息",
-    columns: [
+const baseColumn: PlusColumn[] =
+  [
       { label: "任务id", prop: "id" },
       {
         label: "调度类型",
@@ -23,7 +21,9 @@ const baseColumn: PlusFormGroupRow[] = [
       },
       { label: "所有人", prop: "owner" },
       { label: "名称", prop: "name" },
-      { label: "关注人员", prop: "focusUser" },
+      {
+        label: "关注人员", prop: "focusUser"
+      },
       { label: "任务类型", prop: "runType" },
       { label: "管理员", prop: "uIdS" },
       {
@@ -50,49 +50,21 @@ const baseColumn: PlusFormGroupRow[] = [
       { label: "机器组", prop: "hostGroupName" },
       { label: "描述", prop: "description", colProps: { span: 12 } },
       { label: "预计时长", prop: "jobDurationTime" }
-    ]
-  },
-  {
-    title: "配置项信息",
-    columns: [
-      {
-        label: "配置项信息",
-        prop: "selfConfigs",
-        labelWidth: "120px",
-        colProps: { span: 24 }
-      },
-
-      {
-        label: "继承的配置项信息",
-        prop: "inheritConfig",
-        labelWith: "200px",
-        colProps: {
-          span: 24,
-          labelWidth: "200px"
-        }
-      }
-    ]
-  },
-  {
-    title: "脚本",
-    columns: [{ label: "脚本", prop: "script" }]
-  }
-];
+]
 // 定时调度任务字段
-const cronColumn: PlusFormGroupRow[] = deepCopy(baseColumn);
-cronColumn[0].columns.splice(4, 0, {
+const cronColumn: PlusColumn[] = deepCopy(baseColumn);
+cronColumn.splice(4, 0, {
   label: "定时表达式",
   prop: "cronExpression"
 });
 
 // 依赖任务字段
-const depColumn: PlusFormGroupRow[] = deepCopy(baseColumn);
-depColumn[0].columns.splice(4, 0, { label: "依赖任务", prop: "dependencies" });
-depColumn[0].columns.splice(7, 0, {
+const depColumn: PlusColumn[] = deepCopy(baseColumn);
+depColumn.splice(4, 0, { label: "依赖任务", prop: "dependencies" });
+depColumn.splice(7, 0, {
   label: "依赖周期",
   prop: "heraDependencyCycle"
 });
 
-console.log(depColumn);
 
 export { baseColumn, cronColumn, depColumn };
